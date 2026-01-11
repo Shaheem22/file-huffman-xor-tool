@@ -1,8 +1,4 @@
 
-### Huffman + XOR README
-Paste into `file-huffman-xor-tool/README.md`:
-
-```md
 # Huffman + XOR File Tool (C++)
 
 Compresses files using Huffman coding and applies XOR encryption using a user-provided key.
