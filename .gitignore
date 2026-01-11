@@ -1,0 +1,13 @@
+# Build outputs
+*.exe
+*.out
+*.o
+*.obj
+
+# Encoded/encrypted outputs
+*.bin
+*.enc
+
+# OS noise
+.DS_Store
+Thumbs.db
