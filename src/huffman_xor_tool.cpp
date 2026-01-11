@@ -3,15 +3,13 @@
 #include <string>
 using namespace std;
 
-// Class representing a node in the binary tree used for Huffman coding
 class BinaryTree {
 public:
-    char value;         // Character value stored in the node
-    int freq;           // Frequency of the character
-    BinaryTree* left;   // Pointer to the left child
-    BinaryTree* right;  // Pointer to the right child
+    char value;         
+    int freq;          
+    BinaryTree* left;   
+    BinaryTree* right;  
 
-    // Constructor to initialize the node with a character and its frequency
     BinaryTree(char val, int f) {
         value = val;
         freq = f;
@@ -19,28 +17,24 @@ public:
         right = nullptr;
     }
 
-    // Destructor to free the allocated memory for child nodes
     ~BinaryTree() {
         delete left;
         delete right;
     }
 };
 
-// Custom swap function to exchange two BinaryTree pointers
 void custom_swap(BinaryTree*& a, BinaryTree*& b) {
     BinaryTree* temp = a;
     a = b;
     b = temp;
 }
 
-// Class representing a MinHeap for managing BinaryTree nodes
 class MinHeap {
 private:
-    BinaryTree** heap; // Dynamic array for storing the heap
-    int capacity;      // Current capacity of the heap
-    int size;          // Current number of elements in the heap
+    BinaryTree** heap; 
+    int capacity;      
+    int size;          
 
-    // Function to resize the heap when it reaches capacity
     void resize() {
         capacity *= 2;
         BinaryTree** newHeap = new BinaryTree*[capacity];
@@ -50,7 +44,6 @@ private:
         heap = newHeap;
     }
 
-    // Function to maintain the heap property by shifting down
     void heapifyDown(int idx) {
         int smallest = idx;
         int left = 2 * idx + 1;
@@ -68,7 +61,6 @@ private:
         }
     }
 
-    // Function to maintain the heap property by shifting up
     void heapifyUp(int idx) {
         if (idx && heap[idx]->freq < heap[(idx - 1) / 2]->freq) {
             custom_swap(heap[idx], heap[(idx - 1) / 2]);
@@ -77,12 +69,10 @@ private:
     }
 
 public:
-    // Constructor to initialize the heap
     MinHeap() : capacity(10), size(0) {
         heap = new BinaryTree*[capacity];
     }
 
-    // Destructor to free memory
     ~MinHeap() {
         for (int i = 0; i < size; ++i) {
             delete heap[i];
@@ -90,7 +80,6 @@ public:
         delete[] heap;
     }
 
-    // Function to insert a new node into the heap
     void push(BinaryTree* node) {
         if (size == capacity)
             resize();
@@ -98,7 +87,6 @@ public:
         heapifyUp(size++);
     }
 
-    // Function to remove and return the smallest node (root) from the heap
     BinaryTree* pop() {
         if (size == 0)
             return nullptr;
@@ -108,29 +96,25 @@ public:
         return root;
     }
 
-    // Function to get the current size of the heap
     int getSize() const {
         return size;
     }
 };
 
-// Class representing the Huffman coding process
 class HuffmanCode {
 private:
-    string path;            // Path to the input file
-    MinHeap heap;           // MinHeap for managing the binary tree nodes
-    int freq[256] = {0};    // Frequency array for each character
-    string codes[256];      // Array to store the Huffman codes for each character
-    BinaryTree* root;       // Root of the Huffman tree
+    string path;           
+    MinHeap heap;
+    int freq[256] = {0};    
+    string codes[256];   
+    BinaryTree* root;   
 
-    // Helper function to calculate the frequency of each character in the text
     void __frequency_from_text(const string& text) {
         for (char c : text) {
             freq[static_cast<unsigned char>(c)]++;
         }
     }
 
-    // Helper function to build the MinHeap from the frequency array
     void __Build_heap() {
         for (int i = 0; i < 256; ++i) {
             if (freq[i] > 0) {
@@ -139,7 +123,6 @@ private:
         }
     }
 
-    // Helper function to build the Huffman binary tree from the MinHeap
     void __Build_Binary_Tree() {
         while (heap.getSize() > 1) {
             BinaryTree* left = heap.pop();
@@ -155,12 +138,10 @@ private:
         root = heap.pop();
     }
 
-    // Recursive helper function to build the Huffman codes
     void __Build_Binary_Code_Helper(BinaryTree* root, string curr_bits) {
         if (!root)
             return;
 
-        // If it's a leaf node, store the code for the character
         if (root->value != '\0') {
             codes[static_cast<unsigned char>(root->value)] = curr_bits;
             return;
@@ -170,12 +151,10 @@ private:
         __Build_Binary_Code_Helper(root->right, curr_bits + "1");
     }
 
-    // Helper function to initiate the Huffman code building process
     void __Build_Binary_Code() {
         __Build_Binary_Code_Helper(root, "");
     }
 
-    // Helper function to encode the input text using Huffman codes
     string __Build_encoded_text(const string& text) {
         string encoded_text;
         for (char c : text)
@@ -183,7 +162,6 @@ private:
         return encoded_text;
     }
 
-    // Helper function to write the encoded text to a binary file
     void __write_to_file(const string& output_path, const string& encoded_text) {
         ofstream outfile(output_path, ios::binary);
         if (!outfile.is_open()) {
@@ -217,7 +195,6 @@ private:
         outfile.close();
     }
 
-    // Helper function to read encoded binary data from a file
     string __read_from_file(const string& input_path) {
         ifstream infile(input_path, ios::binary);
         if (!infile.is_open()) {
@@ -237,7 +214,6 @@ private:
         return encoded_text;
     }
 
-    // Helper function to decode the encoded text using the Huffman tree
     string __Decoded_text(const string& encoded_text) {
         if (!root) {
             cerr << "Error: Huffman tree not built." << endl;
@@ -267,7 +243,6 @@ private:
         return decoded_text;
     }
 
-    // XOR Encryption and Decryption function
     void xorFile(const string& inputPath, const string& outputPath, const string& key) {
         ifstream inFile(inputPath, ios::binary);
         ofstream outFile(outputPath, ios::binary);
@@ -294,15 +269,12 @@ private:
     }
 
 public:
-    // Constructor to initialize the HuffmanCode object with the input file path
     HuffmanCode(const string& p) : path(p), root(nullptr) {}
 
-    // Destructor to free the memory for the Huffman tree
     ~HuffmanCode() {
         delete root;
     }
 
-    // Function to compress the input file and write the output to a binary file
     void compression(const string& output_path) {
         ifstream file(path);
         string text((istreambuf_iterator<char>(file)), (istreambuf_iterator<char>()))
@@ -318,7 +290,6 @@ public:
         cout << "Compression done. Output written to: " << output_path << endl;
     }
 
-    // Function to decompress a binary file and write the output to a text file
     void decompression(const string& input_path, const string& output_path) {
         string encoded_text = __read_from_file(input_path);
         string decoded_text = __Decoded_text(encoded_text);
@@ -335,7 +306,6 @@ public:
         cout << "Decompression done. Output written to: " << output_path << endl;
     }
 
-    // Function to perform XOR encryption or decryption
     void xorEncryption(const string& inputFile, const string& outputFile, const string& key) {
         xorFile(inputFile, outputFile, key);
     }
@@ -345,7 +315,6 @@ int main() {
     string input_path, compressed_path, decompressed_path, xor_encrypted_path, xor_decrypted_path;
     string xor_key;
 
-    // Prompt the user for file paths
     cout << "Enter Path to the file to be compressed: ";
     getline(cin, input_path);
 
@@ -364,14 +333,13 @@ int main() {
     cout << "Enter XOR key: ";
     getline(cin, xor_key);
 
-    // Create HuffmanCode object and perform compression and decompression
     HuffmanCode h(input_path);
     h.compression(compressed_path);
     h.decompression(xor_decrypted_path, decompressed_path);
 
-    // Perform XOR encryption and decryption
     h.xorEncryption(compressed_path, xor_encrypted_path, xor_key);
     h.xorEncryption(xor_encrypted_path, xor_decrypted_path, xor_key);
 
     return 0;
 }
+
